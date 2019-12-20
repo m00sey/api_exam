@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession, Row, SQLContext
-from pyspark.sql.functions import lit
+from pyspark.sql.functions import lit, col, length
 import glob
 import os
 import datetime
@@ -55,12 +55,45 @@ col_info = [
         }
     ]
 
-def nulls_and_datatypes(dfRaw, col_info, dfError):
+def condition(dfRaw, col_condition, col_name):
+
+    if "len" in col_condition:
+        dfTemp = dfRaw.filter(length(col(col_name)) != col_condition['len'])
+        dfTemp = dfTemp.withColumn("Error Details", lit("The len of the coloumn does not match the given condition"))
+        print ("FROM LEN:", dfTemp.show(10))
+
+    elif "max_len" in col_condition and "min_len" in col_condition:
+        dfTemp = dfRaw.filter(length(col(col_name)) > col_condition['max_len'] & 
+                              length(col(col_name)) < col_condition['min_len'])
+        dfTemp = dfTemp.withColumn("Error Details", lit("The len of the coloum does not match the given constaints"))
+        print ("Should not be printed:", dfTemp.show(10))
+
+    elif "max_len" in col_condition or "min_len" in col_condition:
+        if "max_len" in col_condition:
+            dfTemp = dfRaw.filter(length(col(col_name)) > col_condition['max_len'])
+            dfTemp = dfTemp.withColumn("Error Details", lit("The len of the coloum does not match the given constaints"))
+            print ("with max length: ", dfTemp.show(10))
+
+        elif "min_len" in col_condition:
+            dfTemp = dfRaw.filter(length(col(col_name)) < col_condition['min_len'])
+            dfTemp = dfTemp.withColumn("Error Details", lit("The len of the coloum does not match the given constaints"))
+            print ("this also should not printL ", dfTemp.show(10))
+    
+    if "format" in col_condition:
+        pass
+    
+    print ("From condition: ", dfTemp.count())
+    return dfTemp
+
+def validate(dfRaw, col_info, dfError):
     if not col_info['nullable']:
         dfCorrectData = dfRaw.withColumn(col_info['col_name'], dfRaw[col_info['col_name']].cast(col_info['datatype'])).na.drop(subset=[col_info['col_name']])
         dftemp = dfRaw.exceptAll(dfCorrectData)
         dftemp = dftemp.withColumn("Error Details", lit("{col_name} is null or the data type provided is wrong".format(col_name = col_info['col_name'])))
         dfError = dfError.union(dftemp)
+
+        dfCondition = condition(dfRaw, col_info['condition'], col_info['col_name'])
+        dfError = dfError.union(dfCondition)
     return dfError
 
 for csv in csv_files:
@@ -70,7 +103,7 @@ for csv in csv_files:
     dfRaw = spark.read.load(csv, format='csv', sep=',', header= True)
     dfRaw = dfRaw.withColumn("Error Details", lit("Everythign is Awesome"))
 
-    dfError = (reduce(lambda dfError, col_info: nulls_and_datatypes(dfRaw, col_info, dfError), col_info, dfRaw))
+    dfError = (reduce(lambda dfError, col_info: validate(dfRaw, col_info, dfError), col_info, dfRaw))
     dfError = dfError.exceptAll(dfRaw)
 
     if dfError.count() != 0:
