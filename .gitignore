@@ -1,0 +1,6 @@
+# custom ignore
+input-directory/*
+error-directory/*
+output-directory/*
+processed/*
+*.pyc
