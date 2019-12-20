@@ -50,7 +50,8 @@ class Service():
                 "datatype": "string",
                 "nullable": False,
                 "condition": {
-                    "max_len": 15
+                    "max_len": 15,
+                    "format": r"^[1-9]\d{2}-\d{3}-\d{4}"
                 }
             }
         ]

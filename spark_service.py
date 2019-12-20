@@ -36,18 +36,21 @@ class Spark_Service():
         elif "max_len" in col_condition and "min_len" in col_condition:
             dfTemp = dfRaw.filter(length(col(col_name)) > col_condition['max_len'] & 
                                 length(col(col_name)) < col_condition['min_len'])
-            dfTemp = dfTemp.withColumn("ERROR_MSG", lit("The len of the coloum does not match the given constaints"))
+            dfTemp = dfTemp.withColumn("ERROR_MSG", lit("The len of the coloum does not match the given condition"))
 
         elif "max_len" in col_condition or "min_len" in col_condition:
             if "max_len" in col_condition:
                 dfTemp = dfRaw.filter(length(col(col_name)) > col_condition['max_len'])
-                dfTemp = dfTemp.withColumn("ERROR_MSG", lit("The len of the coloum does not match the given constaints"))
+                dfTemp = dfTemp.withColumn("ERROR_MSG", lit("The len of the coloum does not match the given condition"))
 
             elif "min_len" in col_condition:
                 dfTemp = dfRaw.filter(length(col(col_name)) < col_condition['min_len'])
-                dfTemp = dfTemp.withColumn("ERROR_MSG", lit("The len of the coloum does not match the given constaints"))
+                dfTemp = dfTemp.withColumn("ERROR_MSG", lit("The len of the coloum does not match the given condition"))
         
         if "format" in col_condition:
+            dfCorrect = dfRaw.filter(col(col_name).rlike(col_condition['format']))
+            dfTemp = dfRaw.exceptAll(dfCorrect)
+            dfTemp = dfTemp.withColumn("ERROR_MSG", lit("Given format does not match."))
             pass
         
         return dfTemp

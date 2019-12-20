@@ -25,6 +25,7 @@ This repo contains an exercise intended for Back-End Engineers.
 1. All the file are expected to be in csv with delimeter as `,`.
 1. When the service object is created it will look for files in `input-directory` and `processed`. If it is in `processed` it will be not do anything on that file.
 1. Then it iterates over everyfile, and validates the data. If there are any errors it will be put into error dataframe with error message and I write down that file in `error-directory`. If the error count is zero then I write down it in `output-directory` in json format. All the read and writes are performed by spark in the same generic function.
+1. If a row fails for multiple conditions that row will be present multiple times in the error csv to accomodate all the `ERR_MSG`.
 
 ## Reason for using pyspark
 1. Pyspark runs in distributed environment and gives better performance.
