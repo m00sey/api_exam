@@ -9,6 +9,7 @@ class Service():
         for process in self.processed:
             if process in self.csv_files:
                 self.csv_files.remove(process)
+                #  need to delete from input-directory
         self.col_info = [
             {
                 "col_name": "INTERNAL_ID",
