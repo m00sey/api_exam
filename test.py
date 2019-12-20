@@ -7,6 +7,7 @@ import datetime
 class Service():
     def __init__(self):
         self.csv_files = glob.glob(os.path.join(os.getcwd() + '/input-directory', '*.csv'))
+        self.processed = glob.glob(os.path.join(os.getcwd() + '/processed', '*.csv'))
         self.col_info = [
             {
                 "col_name": "INTERNAL_ID",
@@ -100,26 +101,21 @@ class Spark_Service():
 
 if __name__ == "__main__":
     s = Service()
-
     spark_service = Spark_Service()
-    spark = SparkSession \
-            .builder \
-            .appName("Grism Scoir") \
-            .getOrCreate()
-    spark.sparkContext.setLogLevel('WARN')
 
     for csv in s.csv_files:
         print ("###################################### NEW FILE #########################################")
-        print ("csv file:", csv)
+        print ("INFO: File to Validate: ", csv)
 
         dfRaw = spark_service.file_to_df(csv, 'csv', ',')
+        print ("INFO: Number of Rows in the file: ", dfRaw.count())
         dfRaw = dfRaw.withColumn("Error Details", lit("Everythign is Awesome"))
 
         dfError = (reduce(lambda dfError, col_info: spark_service.validate(dfRaw, col_info, dfError), s.col_info, dfRaw))
         dfError = dfError.exceptAll(dfRaw)
 
         if dfError.count() != 0:
-            print ("Error File: ", csv)
+            print ("INFO: The file that failed Validation: ", csv)
+            print ("INFO: Number of rows Failed in Validation: ", dfError.count())
             dfError.show()
             # put it into error-directory folder
-
