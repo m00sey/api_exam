@@ -14,6 +14,7 @@ This repo contains an exercise intended for Back-End Engineers.
 1. This exercise is meant to showcase how you work. With consideration to the time limit, do your best to treat it like a production system.
 
 ## Installing Spark and Java
+1. The instructions are for MACOS
 1. /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 1. brew cask install adoptopenjdk/openjdk/adoptopenjdk8
 1. brew install apache-spark (to verify type pyspark --version in command line)
