@@ -126,6 +126,6 @@ if __name__ == "__main__":
             dfError.show()
             spark_service.write(dfError, os.getcwd() + '/error-directory/' + csv.split('/')[-1], 'csv', 1, ',')
         else:
-            # put it in json output format
-            pass
+            dfRaw = dfRaw.drop('ERROR_MSG')
+            spark_service.write(dfRaw, os.getcwd() + '/output-directory/' + csv.split('/')[-1], 'json', 1, ',')
         s.move_file(csv, os.getcwd() + '/processed/' + csv.split('/')[-1])
