@@ -24,8 +24,8 @@ This repo contains an exercise intended for Back-End Engineers.
 ## Working
 1. All the file are expected to be in csv with delimeter as `,`.
 1. When the service object is created it will look for files in `input-directory` and `processed`. If it is in `processed` it will be not do anything on that file.
-1. Then it iterates over everyfile, and validates the data. Should there be any errors it will be put into error dataframe with error message and we write down that file in `error-directory`. If the error count is zero the we write down it in `output-directory` in json format. All the read and writes are performed by spark in the same generic function.
+1. Then it iterates over everyfile, and validates the data. If there are any errors it will be put into error dataframe with error message and I write down that file in `error-directory`. If the error count is zero then I write down it in `output-directory` in json format. All the read and writes are performed by spark in the same generic function.
 
 ## Reason for using pyspark
 1. Pyspark runs in distributed environment and gives better performance.
-1. If noticed I did not loop any rows in a dataframe to validate (normal python have to loop), the advantage of using pyspark over python as it is scalable should there be million rows.
+1. If noticed I did not loop any rows in a dataframe to validate (normal python have to loop), the advantage of using pyspark over python as it is scalable even for million rows. The coloumns can be vectorized to do operations.

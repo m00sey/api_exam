@@ -6,10 +6,12 @@ class Service():
     def __init__(self):
         self.csv_files = glob.glob(os.path.join(os.getcwd() + '/input-directory', '*.csv'))
         self.processed = glob.glob(os.path.join(os.getcwd() + '/processed', '*.csv'))
-        for process in self.processed:
-            if process in self.csv_files:
-                self.csv_files.remove(process)
-                #  need to delete from input-directory
+        self.processed_dicts = {}
+
+        for csv in self.processed:
+            fileName = csv.split('/')[-1]
+            self.processed_dicts[fileName] = True
+
         self.col_info = [
             {
                 "col_name": "INTERNAL_ID",

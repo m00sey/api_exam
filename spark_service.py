@@ -23,8 +23,8 @@ class Spark_Service():
             dftemp = dftemp.withColumn("ERROR_MSG", lit("{col_name} is null or the data type provided is wrong".format(col_name = col_info['col_name'])))
             dfError = dfError.union(dftemp)
 
-            dfCondition = self.condition(dfRaw, col_info['condition'], col_info['col_name'])
-            dfError = dfError.union(dfCondition)
+        dfCondition = self.condition(dfRaw, col_info['condition'], col_info['col_name'])
+        dfError = dfError.union(dfCondition)
         return dfError
 
     def condition(self, dfRaw, col_condition, col_name):
