@@ -12,7 +12,7 @@ spark = SparkSession \
 spark.sparkContext.setLogLevel('WARN')
 
 def nulls_and_datatypes(dfRaw, col_name, dfError):
-    dfCorrectData = dfRaw.withColumn("INTERNAL_ID", dfRaw["INTERNAL_ID"].cast("int")).na.drop(subset=["INTERNAL_ID"])
+    dfCorrectData = dfRaw.withColumn(col_name, dfRaw[col_name].cast("int")).na.drop(subset=[col_name])
     dftemp = dfRaw.exceptAll(dfCorrectData)
     dfError = dfError.union(dftemp)
     return dfError
@@ -24,11 +24,7 @@ for csv in csv_files:
 
     print ("File Count: ", dfRaw.count())
 
-    # checking for nulls and datatype
-    # dfCorrectData = dfRaw.withColumn("INTERNAL_ID", dfRaw["INTERNAL_ID"].cast("int")).na.drop(subset=["INTERNAL_ID"])
-    # dfError = dfRaw.exceptAll(dfCorrectData)
-
-    col_name = ["INTERNAL_ID"]
+    col_name = ["INTERNAL_ID", "FIRST_NAME", "MIDDLE_NAME", "LAST_NAME", "PHONE_NUM"]
     dfError = (reduce(lambda dfError, col_name: nulls_and_datatypes(dfRaw, col_name, dfError), col_name, dfRaw))
     dfError = dfError.exceptAll(dfRaw)
 
